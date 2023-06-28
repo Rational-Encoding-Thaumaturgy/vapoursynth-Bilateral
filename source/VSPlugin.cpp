@@ -24,14 +24,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin configFunc, VSRegisterFunction registerFunc, VSPlugin *plugin)
+VS_EXTERNAL_API(void) VapourSynthPluginInit2(VSPlugin *plugin, const VSPLUGINAPI *vspapi)
 {
-    configFunc("mawen1250.Bilateral", "bilateral",
+    vspapi->configPlugin("com.mawen1250.Bilateral", "bilateral",
         "Bilateral filter and Gaussian filter for VapourSynth.",
-        VAPOURSYNTH_API_VERSION, 1, plugin);
+        VS_MAKE_VERSION(1, 0), VAPOURSYNTH_API_VERSION, 0, plugin);
 
-    registerFunc("Bilateral", "input:clip;ref:clip:opt;sigmaS:float[]:opt;sigmaR:float[]:opt;planes:int[]:opt;algorithm:int[]:opt;PBFICnum:int[]:opt", BilateralCreate, nullptr, plugin);
-    registerFunc("Gaussian", "input:clip;sigma:float[]:opt;sigmaV:float[]:opt", GaussianCreate, nullptr, plugin);
+    vspapi->registerFunction("Bilateral", "input:vnode;ref:vnode:opt;sigmaS:float[]:opt;sigmaR:float[]:opt;planes:int[]:opt;algorithm:int[]:opt;PBFICnum:int[]:opt", "clip:vnode;", BilateralCreate, nullptr, plugin);
+    vspapi->registerFunction("Gaussian", "input:vnode;sigma:float[]:opt;sigmaV:float[]:opt", "clip:vnode;", GaussianCreate, nullptr, plugin);
 }
 
 

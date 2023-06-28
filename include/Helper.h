@@ -23,8 +23,8 @@
 
 #include <vector>
 #include <cfloat>
-#include <vapoursynth/VapourSynth.h>
-#include <vapoursynth/VSHelper.h>
+#include <VapourSynth4.h>
+#include <VSHelper4.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ template < typename T >
 T * newbuff(const T * src, int xoffset, int yoffset,
     int bufheight, int bufwidth, int bufstride, int height, int width, int stride)
 {
-    T * dst = vs_aligned_malloc<T>(sizeof(T)*bufheight*bufstride, Alignment);
+    T * dst = vsh::vsh_aligned_malloc<T>(sizeof(T)*bufheight*bufstride, Alignment);
     data2buff(dst, src, xoffset, yoffset, bufheight, bufwidth, bufstride, height, width, stride);
     return dst;
 }
@@ -128,7 +128,7 @@ T * newbuff(const T * src, int xoffset, int yoffset,
 template < typename T >
 void freebuff(T * buff)
 {
-    vs_aligned_free(buff);
+    vsh::vsh_aligned_free(buff);
 }
 
 

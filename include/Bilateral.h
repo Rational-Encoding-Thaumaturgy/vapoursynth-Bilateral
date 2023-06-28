@@ -31,9 +31,9 @@
 class BilateralData {
 public:
     const VSAPI *vsapi = nullptr;
-    VSNodeRef *node = nullptr;
+    VSNode *node = nullptr;
     const VSVideoInfo *vi = nullptr;
-    VSNodeRef *rnode = nullptr;
+    VSNode *rnode = nullptr;
     const VSVideoInfo *rvi = nullptr;
 
     bool joint = false;
@@ -80,7 +80,7 @@ public:
 
     bool isYUV() const
     {
-        return vi->format->colorFamily == cmYUV || vi->format->colorFamily == cmYCoCg;
+        return vi->format.colorFamily == cfYUV;
     }
 
     FLType * GS_LUT(int plane) { return GS_LUT_[plane]; }
@@ -107,7 +107,7 @@ public:
         {
             if (process[i])
             {
-                GR_LUT_[i] = Gaussian_Function_Range_LUT_Generation((1 << vi->format->bitsPerSample) - 1, sigmaR[i]);
+                GR_LUT_[i] = Gaussian_Function_Range_LUT_Generation((1 << vi->format.bitsPerSample) - 1, sigmaR[i]);
             }
         }
 
@@ -194,13 +194,13 @@ void VS_CC BilateralCreate(const VSMap *in, VSMap *out, void *userData, VSCore *
 
 
 template < typename T >
-void Bilateral2D(VSFrameRef * dstf, const VSFrameRef * srcf, const VSFrameRef * reff, const BilateralData * d, const VSAPI * vsapi)
+void Bilateral2D(VSFrame * dstf, const VSFrame * srcf, const VSFrame * reff, const BilateralData * d, const VSAPI * vsapi)
 {
     const T *src, *ref;
     T *dst;
     int height, width, stride;
 
-    const VSFormat *fi = vsapi->getFrameFormat(srcf);
+    const VSVideoFormat *fi = vsapi->getVideoFrameFormat(srcf);
     int bps = fi->bitsPerSample;
 
     for (int plane = 0; plane < fi->numPlanes; plane++)
@@ -270,12 +270,12 @@ void Bilateral2D_1(T * dst, const T * src, const T * ref, const BilateralData * 
 
     // Generate quantized PBFICs
     FLType ** PBFIC = new FLType*[PBFICnum];
-    FLType * Wk = vs_aligned_malloc<FLType>(sizeof(FLType)*pcount, Alignment);
-    FLType * Jk = vs_aligned_malloc<FLType>(sizeof(FLType)*pcount, Alignment);
+    FLType * Wk = vsh::vsh_aligned_malloc<FLType>(sizeof(FLType)*pcount, Alignment);
+    FLType * Jk = vsh::vsh_aligned_malloc<FLType>(sizeof(FLType)*pcount, Alignment);
 
     for (k = 0; k < PBFICnum; k++)
     {
-        PBFIC[k] = vs_aligned_malloc<FLType>(sizeof(FLType)*pcount, Alignment);
+        PBFIC[k] = vsh::vsh_aligned_malloc<FLType>(sizeof(FLType)*pcount, Alignment);
 
         for (j = 0; j < height; j++)
         {
@@ -319,9 +319,9 @@ void Bilateral2D_1(T * dst, const T * src, const T * ref, const BilateralData * 
 
     // Clear
     for (k = 0; k < PBFICnum; k++)
-        vs_aligned_free(PBFIC[k]);
-    vs_aligned_free(Jk);
-    vs_aligned_free(Wk);
+        vsh::vsh_aligned_free(PBFIC[k]);
+    vsh::vsh_aligned_free(Jk);
+    vsh::vsh_aligned_free(Wk);
     delete[] PBFIC;
     delete[] PBFICk;
 }

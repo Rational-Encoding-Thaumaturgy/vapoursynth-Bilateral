@@ -31,7 +31,7 @@
 class GaussianData {
 public:
     const VSAPI *vsapi = nullptr;
-    VSNodeRef *node = nullptr;
+    VSNode *node = nullptr;
     const VSVideoInfo *vi = nullptr;
 
     double sigma[3];
@@ -158,14 +158,14 @@ inline void Gaussian_Function_Range_LUT_Free(FLType * GR_LUT)
 
 
 template < typename T >
-void Gaussian2D(VSFrameRef * dst, const VSFrameRef * src, const GaussianData * d, const VSAPI * vsapi)
+void Gaussian2D(VSFrame * dst, const VSFrame * src, const GaussianData * d, const VSAPI * vsapi)
 {
     int i, j, upper;
     const T *srcp;
     T *dstp;
     int stride, width, height, pcount;
 
-    const VSFormat *fi = vsapi->getFrameFormat(src);
+    const VSVideoFormat *fi = vsapi->getVideoFrameFormat(src);
     
     int bps = fi->bitsPerSample;
     int Floor = 0;
@@ -192,7 +192,7 @@ void Gaussian2D(VSFrameRef * dst, const VSFrameRef * src, const GaussianData * d
             Recursive_Gaussian_Parameters(d->sigmaV[plane], B_V, B1_V, B2_V, B3_V);
 
             // Convert src to floating point data
-            FLType * data = vs_aligned_malloc<FLType>(sizeof(FLType)*pcount, Alignment);
+            FLType * data = vsh::vsh_aligned_malloc<FLType>(sizeof(FLType)*pcount, Alignment);
 
             for (j = 0; j < height; j++)
             {
@@ -218,7 +218,7 @@ void Gaussian2D(VSFrameRef * dst, const VSFrameRef * src, const GaussianData * d
             }
 
             // Clear
-            vs_aligned_free(data);
+            vsh::vsh_aligned_free(data);
         }
     }
 }

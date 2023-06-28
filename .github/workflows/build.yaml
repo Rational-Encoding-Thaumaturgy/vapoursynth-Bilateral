@@ -28,8 +28,8 @@ jobs:
       - name: download VS headers and patch header location
         shell: bash
         run: |
-          git clone https://github.com/AmusementClub/vapoursynth-classic --depth=1 --branch doodle2 vapoursynth
-          mv vapoursynth/include include/vapoursynth
+          git clone https://github.com/vapoursynth/vapoursynth --depth=1 --branch master vapoursynth
+          mv vapoursynth/include/* include/
       - name: Meson setup
         run: meson setup builddir/ -Db_vscrt=mt
       - name: Meson compile
